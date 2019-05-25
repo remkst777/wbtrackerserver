@@ -7,7 +7,7 @@ const {
   GET_PRICE_URL,
   GET_HTML_URL,
   DATE_DIVIDER,
-  PRICE_DIVIDER,
+  PRICE_DIVIDER
 } = require("./constants");
 
 const getStartOfDay = day => {

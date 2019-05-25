@@ -169,45 +169,42 @@ router.post("/start-tracking", async (req, res) => {
   }
 });
 
-router.get(
-  "/update-data/12/342/53/2/5/62/21/3/34/56/32/1",
-  async (req, res) => {
-    try {
-      const products = await ProductsModel.find();
+router.get("/update-data/66/66/66/66/66", async (req, res) => {
+  try {
+    const products = await ProductsModel.find();
 
-      const DateNow = Date.now();
+    const DateNow = Date.now();
 
-      products.forEach(async x => {
-        // CHECKING: if tracking is valid
-        if (+x.startTracking + TRACKING_PERIOD < DateNow) return null;
+    products.forEach(async x => {
+      // CHECKING: if tracking is valid
+      if (+x.startTracking + TRACKING_PERIOD < DateNow) return null;
 
-        const currentPrice = await getCurrentPrice(x.articul);
+      const currentPrice = await getCurrentPrice(x.articul);
 
-        ProductsModel.findByIdAndUpdate(
-          x._id,
-          { history: [...x.history, currentPrice] },
-          { new: true },
-          () => null
-        );
+      ProductsModel.findByIdAndUpdate(
+        x._id,
+        { history: [...x.history, currentPrice] },
+        { new: true },
+        () => null
+      );
 
-        const prevCost = x.history[x.history.length - 1][0];
-        const actualCost = currentPrice[0];
+      const prevCost = x.history[x.history.length - 1][0];
+      const actualCost = currentPrice[0];
 
-        // to notify users about cost lowering
-        if (actualCost < prevCost) {
-          const costLower = Math.round((1 - actualCost / prevCost) * 100);
+      // to notify users about cost lowering
+      if (actualCost < prevCost) {
+        const costLower = Math.round((1 - actualCost / prevCost) * 100);
 
-          x.users.map(email => {
-            sendEmail(email, x.articul, costLower, actualCost, x.name);
-          });
-        }
-      });
+        x.users.map(email => {
+          sendEmail(email, x.articul, costLower, actualCost, x.name);
+        });
+      }
+    });
 
-      res.status(200).send({ message: "Ок" });
-    } catch (err) {
-      res.status(500).send({ message: "Ошибка сервера..." });
-    }
+    res.status(200).send({ message: "Ок" });
+  } catch (err) {
+    res.status(500).send({ message: "Ошибка сервера..." });
   }
-);
+});
 
 module.exports = router;
